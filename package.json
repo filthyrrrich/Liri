@@ -18,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/filthyrrrich/Liri/issues"
   },
-  "homepage": "https://github.com/filthyrrrich/Liri#readme"
+  "homepage": "https://github.com/filthyrrrich/Liri#readme",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "inquirer": "^6.0.0",
+    "node-spotify-api": "^1.0.7",
+    "request": "^2.87.0",
+    "twitter": "^1.7.1"
+  }
 }
