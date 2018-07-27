@@ -13,11 +13,10 @@ var input = process.argv[3];
 var nodeArgs = process.argv;
 var inputName = "";
 
-    
-
+//prepares string to be used in url call
 function searchName() {
-    for(i = 3; i < nodeArgs.length; i++){
-        if(inputName === ""){
+    for(i = 3; i < nodeArgs.length; i++) {
+        if(inputName === "") {
             inputName = nodeArgs[i];
         } else if (command === "spotify-this-song") {
         inputName = inputName + " " + nodeArgs[i];
@@ -26,73 +25,100 @@ function searchName() {
         }
     }
 }
- 
 
-if(command === "my-tweets") {
+//grabs last 20 tweets from screen_name
+function searchTweets() {
     var params = {screen_name: 'deadbutton2'};
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
-      if (!error) {
-        for(i=0; i < 20; i++) {
-        console.log("==========================================================================================================")
-        console.log("");
-        console.log("Tweet:");
-        console.log(tweets[i].text);
-        console.log("");
-        console.log("Tweeted at:");
-        console.log(tweets[i].created_at);
-        console.log("");
+        if (!error) {
+            for(i=0; i < 20; i++) {
+            console.log("==========================================================================")
+            console.log("");
+            console.log("Tweet:");
+            console.log(tweets[i].text);
+            console.log("");
+            console.log("Tweeted at:");
+            console.log(tweets[i].created_at);
+            console.log("");
+            }
         }
-      }
     });
+}
+
+//grabs info of song entered
+function searchSong() {
+    console.log("");
+    console.log("You searched: " + "'" + inputName + "'");
+    console.log("Here are the results:");
+
+    spotify.search({ type: 'track', query: inputName, limit: 20 }, function(err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        } else {
+            console.log("");
+            console.log("Artist:");
+            console.log(data.tracks.items[0].artists[0].name);
+            console.log("");
+            console.log("Song:");
+            console.log(data.tracks.items[0].name);
+            console.log("");
+            console.log("Album:");
+            console.log(data.tracks.items[0].album.name);
+            console.log("");
+            console.log("Preview Link:");
+            console.log(data.tracks.items[0].preview_url);
+            console.log("");
+        }
+    });
+}
+
+//grabs info of movie entered
+function searchMovie() {
+    var queryUrl = "http://www.omdbapi.com/?t=" + inputName + "&y=&plot=short&apikey=trilogy";
+    
+    request(queryUrl, function(error, response, body) {
+        var innerJ = JSON.parse(body);
+        var isLogged = false;
+        // If the request is successful (i.e. if the response status code is 200)
+        if (!error && response.statusCode === 200) {
+            
+            console.log("Movie Title: " + innerJ.Title);
+            console.log("Release Date: " + innerJ.Released);
+            console.log("IMDB Rating: " + innerJ.imdbRating);
+            
+            //checks object for "Rotten Tomatoes" rating
+            for (let j = 0; j < innerJ.Ratings.length; j++) {
+                if(innerJ.Ratings[j].Source === "Rotten Tomatoes") {
+                    isLogged = true;
+                    console.log("Rotten Tomatoes Rating: " + innerJ.Ratings[j].Value);
+                } 
+            }
+
+            //if no "Rotten Tomatoes" rating then log this
+            if(isLogged == false) {
+                console.log("This film has no Rotten Tomatoes rating.");
+
+            }
+            
+            console.log("Country Produced: " + innerJ.Country);
+            console.log("Language: " + innerJ.Language);
+            console.log("Plot: " + innerJ.Plot);
+            console.log("Actors: " + innerJ.Actors);
+        }
+      });
+}
+ 
+if(command === "my-tweets") {
+    searchTweets();
 
 } else if(command === "spotify-this-song") {
     searchName();
-    console.log("=============" + inputName);
-
-    // spotify
-    // .search({ type: 'track', query: inputName })
-    // .then(function(response) {
-    //   console.log(response);
-    // })
-    // .catch(function(err) {
-    //   console.log(err);
-    // });
-
-
-    spotify.search({ type: 'track', query: inputName }, function(err, data) {
-        if (err) {
-          return console.log('Error occurred: ' + err);
-        } else {
-            console.log(data);
-        }
-    
-    //   console.log("Artist: " + JSON.parse(data).Artist);
-    //   console.log("Song: " + JSON.parse(data).Song);
-    //   console.log("Album: " + JSON.parse(data).Album);
-    //   console.log("Preview Link: " + JSON.parse(data).Preview);
-      
-      });
+    searchSong();
    
 } else if(command === "movie-this") {
     searchName();
- 
-    var queryUrl = "http://www.omdbapi.com/?t=" + inputName + "&y=&plot=short&apikey=trilogy";
-
-    request(queryUrl, function(error, response, body) {
-
-        // If the request is successful (i.e. if the response status code is 200)
-        if (!error && response.statusCode === 200) {
-            console.log("Movie Title: " + JSON.parse(body).Title);
-            console.log("Release Date: " + JSON.parse(body).Released);
-            console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
-            console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].value);
-            console.log("Country Produced: " + JSON.parse(body).Country);
-            console.log("Language: " + JSON.parse(body).Language);
-            console.log("Plot: " + JSON.parse(body).Plot);
-            console.log("Actors: " + JSON.parse(body).Actors);
-        }
-      });
-
+    searchMovie();
+   
 } else if(command === "do-what-it-says"){
     fs.readFile("random.txt", "utf8", function(error, data) {
 
@@ -102,13 +128,18 @@ if(command === "my-tweets") {
         }
       
         // We will then print the contents of data
-        console.log(data);
+        // console.log("====" + data);
       
         // Then split it by commas (to make it more readable)
         var dataArr = data.split(",");
-      
+        for(i=0; i < dataArr.length; i++){
+            if(i % 2 === 0){
+                console.log(dataArr[i]);
+                console.log("Going to play this: "+ dataArr[i+1]);
+            }
+        }
         // We will then re-display the content as an array for later use.
-        console.log(dataArr);
+        // console.log(dataArr[0]);
       
       });
     //    * Using the `fs` Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.  
