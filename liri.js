@@ -64,7 +64,7 @@ function searchSong() {
     console.log("");
     
     //default search
-    if (!input){
+    if (!input && command === "spotify-this-song"){
         inputName = "Ace of Base";
     }
 
