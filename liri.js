@@ -57,6 +57,9 @@ function searchTweets() {
 
 //grabs info of song entered
 function searchSong() {
+    
+    searchName();
+
     //displays what you searched
     console.log("============================================================================");
     console.log("");
@@ -94,6 +97,9 @@ function searchSong() {
 
 //grabs info of movie entered
 function searchMovie() {
+
+    searchName();
+
     //default search
     if (!input){
         inputName = "Mr Nobody";
@@ -182,11 +188,9 @@ if(command === "my-tweets") {
     searchTweets();
 
 } else if(command === "spotify-this-song") {
-    searchName();
     searchSong();
    
 } else if(command === "movie-this") {
-    searchName();
     searchMovie();
    
 } else if(command === "do-what-it-says"){
